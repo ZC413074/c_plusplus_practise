@@ -7,20 +7,74 @@ namespace observer_mode
 		this->observable_ = observable;
 	}
 
+	StatisticDisplay::StatisticDisplay(Observable *observable)
+	{
+		this->observable_ = observable;
+	}
+
 	void StatisticDisplay::display()
 	{
-		std::cout << "StatisticDisplay:temperature= " << temperature_;
-		std::cout << ", humidity= " << humidity_ << std::endl;
+		std::cout << "StatisticDisplay:temperature= " << observable_->temperature_;
+		std::cout << ", humidity= " << observable_->humidity_ << std::endl;
 	}
 
 	void StatisticDisplay::update(Observable *observables)
 	{
 		observable_ = observables;
-		if (observables->has_changed())
+		if (observables->changed)
 		{
 			WeatherData* weather_data = static_cast<WeatherData*>(observables);
-			temperature_ = weather_data->get_temperature();
-			humidity_ = weather_data->get_humidity();
+			observable_->temperature_ = weather_data->get_temperature();
+			observable_->humidity_ = weather_data->get_humidity();
+		}
+		display();
+	}
+
+	GeneralDisplay::GeneralDisplay(Observable *observable)
+	{
+		this->observable_ = observable;
+	}
+
+	void GeneralDisplay::display()
+	{
+		std::cout << "GeneralDisplays:temperature= " << observable_->temperature_;
+		std::cout << ", humidity= " << observable_->humidity_;
+		std::cout << ", pressure= " << observable_->pressure_ << std::endl;
+	}
+
+	void GeneralDisplay::update(Observable *observables)
+	{
+		observable_ = observables;
+		if (observables->changed)
+		{
+			WeatherData* weather_data = static_cast<WeatherData*>(observables);
+			observable_->temperature_ = weather_data->get_temperature();
+			observable_->humidity_ = weather_data->get_humidity();
+			observable_->pressure_ = weather_data->get_pressure();
+		}
+		display();
+	}
+
+	ForecastDisplay::ForecastDisplay(Observable *observable)
+	{
+		this->observable_ = observable;
+	}
+
+	void ForecastDisplay::display()
+	{
+		std::cout << "ForecastDisplay:temperature= " << observable_->temperature_;
+		std::cout << ", pressure= " << observable_->pressure_ << std::endl;
+	}
+
+	void ForecastDisplay::update(Observable *observables)
+	{
+		observable_ = observables;
+		if (observables->changed)
+		{
+			WeatherData* weather_data = static_cast<WeatherData*>(observables);
+			observable_->temperature_ = weather_data->get_temperature();
+			observable_->humidity_ = weather_data->get_humidity();
+			observable_->pressure_ = weather_data->get_pressure();
 		}
 		display();
 	}
