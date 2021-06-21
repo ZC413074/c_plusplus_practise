@@ -18,12 +18,11 @@ namespace observer_mode
 		std::cout << ", humidity= " << observable_->humidity_ << std::endl;
 	}
 
-	void StatisticDisplay::update(Observable *observables)
+	void StatisticDisplay::update(Observable *observable)
 	{
-		observable_ = observables;
-		if (observables->changed)
+		if (observable->changed_)
 		{
-			WeatherData* weather_data = static_cast<WeatherData*>(observables);
+			WeatherData* weather_data = static_cast<WeatherData*>(observable);
 			observable_->temperature_ = weather_data->get_temperature();
 			observable_->humidity_ = weather_data->get_humidity();
 		}
@@ -42,12 +41,11 @@ namespace observer_mode
 		std::cout << ", pressure= " << observable_->pressure_ << std::endl;
 	}
 
-	void GeneralDisplay::update(Observable *observables)
+	void GeneralDisplay::update(Observable *observable)
 	{
-		observable_ = observables;
-		if (observables->changed)
+		if (observable->changed_)
 		{
-			WeatherData* weather_data = static_cast<WeatherData*>(observables);
+			WeatherData* weather_data = static_cast<WeatherData*>(observable);
 			observable_->temperature_ = weather_data->get_temperature();
 			observable_->humidity_ = weather_data->get_humidity();
 			observable_->pressure_ = weather_data->get_pressure();
@@ -66,14 +64,12 @@ namespace observer_mode
 		std::cout << ", pressure= " << observable_->pressure_ << std::endl;
 	}
 
-	void ForecastDisplay::update(Observable *observables)
+	void ForecastDisplay::update(Observable *observable)
 	{
-		observable_ = observables;
-		if (observables->changed)
+		if (observable->changed_)
 		{
-			WeatherData* weather_data = static_cast<WeatherData*>(observables);
+			WeatherData* weather_data = static_cast<WeatherData*>(observable);
 			observable_->temperature_ = weather_data->get_temperature();
-			observable_->humidity_ = weather_data->get_humidity();
 			observable_->pressure_ = weather_data->get_pressure();
 		}
 		display();
@@ -84,7 +80,7 @@ namespace observer_mode
 
 	Observable::Observable()
 	{
-		changed = false;
+		changed_ = false;
 	}
 	WeatherData::WeatherData()
 	{
@@ -94,17 +90,17 @@ namespace observer_mode
 	}
 	void WeatherData::set_changed()
 	{
-		changed = true;
+		changed_ = true;
 	}
 
 	void WeatherData::clear_changed()
 	{
-		changed = false;
+		changed_ = false;
 	}
 
 	bool WeatherData::has_changed()
 	{
-		return changed;
+		return changed_;
 	}
 
 	float WeatherData::get_temperature()
@@ -140,33 +136,35 @@ namespace observer_mode
 			}
 	}
 
-	void WeatherData::notify_observer()
+	void WeatherData::notify_observer(Observable* observer)
 	{
-		if (changed)
+		if (changed_)
 		{
 			std::list<Observer2*>::iterator iter = observers.begin();
 			while (iter != observers.end())
 			{
-				(*iter)->update();
+				(*iter)->update(observer);
 				++iter;
 			}
-			changed = false;
+			changed_ = false;
 		}
 	}
-	void WeatherData::measurements_changed()
+	void WeatherData::measurements_changed(Observable* observer)
 	{
 		set_changed();
-		notify_observer();
+		notify_observer(observer);
 	}
 
 	void WeatherData::set_measurements(const float temperature,
 		const float humidity,
 		const float pressure)
 	{
-		temperature_ = temperature;
-		humidity_ = humidity;
-		pressure_ = pressure;
-		measurements_changed();
+		Observable * observable;
+		observable->temperature_ = temperature;
+		observable->humidity_ = humidity;
+		observable->pressure_ = pressure;
+		observable->changed_ = true;
+		measurements_changed(observable);
 
 	}
 

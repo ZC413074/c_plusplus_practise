@@ -29,7 +29,7 @@ namespace observer_mode
 	{
 	public:
 		GeneralDisplay(Observable *observable);
-		void update(Observable *observables);
+		void update(Observable *observable);
 		void display();
 	};
 
@@ -37,7 +37,7 @@ namespace observer_mode
 	{
 	public:
 		ForecastDisplay(Observable *observable);
-		void update(Observable *observables);
+		void update(Observable *observable);
 		void display();
 	};
 #pragma endregion Observer
@@ -52,13 +52,16 @@ namespace observer_mode
 		Observable();
 		virtual void add_observer(Observer2*) = 0;
 		virtual void delete_observer(Observer2*) = 0;
-		virtual void notify_observer() = 0;
+		virtual void notify_observer(Observable* observer) = 0;
+		virtual void set_measurements(const float temperature,
+			const float humidity,
+			const float pressure) = 0;
 		virtual ~Observable() {}
 
 	protected:
 		std::list<Observer2*> observers;
 	public:
-		bool changed;
+		bool changed_;
 		float temperature_;
 		float humidity_;
 		float pressure_;
@@ -66,6 +69,7 @@ namespace observer_mode
 
 	class WeatherData :public Observable
 	{
+
 	public:
 		WeatherData();
 
@@ -73,7 +77,7 @@ namespace observer_mode
 
 		void delete_observer(Observer2* observer);
 
-		void notify_observer();
+		void notify_observer(Observable* observer);
 
 		void set_changed();
 
@@ -87,7 +91,7 @@ namespace observer_mode
 
 		float get_pressure();
 
-		void measurements_changed();
+		void measurements_changed(Observable* observer);
 
 		void set_measurements(const float temperature, 
 			const float humidity, 

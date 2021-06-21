@@ -18,13 +18,20 @@ void observer_test()
 	//dwq->notify();
 
 	/// example 2
-	float temperature = 36.5, humidity = 10.1, pressure = 100.0;
-	WeatherData *weather_observable = new WeatherData();
-	weather_observable->set_measurements(temperature,humidity,pressure);
-	weather_observable->set_changed();
 
-
-	Observable *observable = weather_observable;
+	Observable *observable= new WeatherData();
 	Observer2 *viewer1 = new StatisticDisplay(observable);
+	Observer2 *viewer2 = new GeneralDisplay(observable);
+	Observer2 *viewer3 = new ForecastDisplay(observable);
+	observable->add_observer(viewer1);
+	observable->add_observer(viewer2);
+	observable->add_observer(viewer3);
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "i=" << i << "\n";
+		float temperature = 36.5 + float(i), humidity = 10.1 + float(i), pressure = 100.0 + float(i);
+		observable->set_measurements(temperature, humidity, pressure);
+		observable->notify_observer(observable);
+	}
 
 }
